@@ -1,47 +1,65 @@
-# TP Simulateur — Séance 1 (Java)
+# RCP103 / NCA — TP Simulateur à événements discrets
 
-RCP103 / NCA — Cours 09 : Simulateur à événements discrets  
-P. B. Velloso & A. Hidouri
+Travaux pratiques du Cours 09 (P. B. Velloso & A. Hidouri, CNAM).
+Modèle d'une passerelle IoT : files d'attente M/M/1, M/M/1/K, M/M/c/K.
 
-## Structure
+Le dépôt sépare clairement le **Java** (réalisé séance par séance) du **Python**
+(version complète de référence), et les **séances** entre elles.
+
+## Organisation
 
 ```
-tp_simulateur_java/
-├── src/
-│   ├── EventType.java   # enum : SEND_MSG, RECV_MSG, MSG_DEPT
-│   ├── Message.java     # message IoT (messageID, source, destination, timestamp)
-│   ├── Event.java       # événement daté (eventID, eventType, eventTime, message)
-│   ├── Scheduler.java   # ordonnanceur (PriorityQueue / tas binaire, sans sort())
-│   └── Main.java        # testMessage(), testEvent(), testScheduler(), generateTrace()
-└── README.md
+RCP103-TP2/
+├── java/                  # implémentation Java, par séance (cumulative)
+│   ├── seance1/           # Message, Event, Scheduler + tests
+│   │   ├── src/
+│   │   └── README.md
+│   └── seance2/           # = S1 + Client, Queue, Server + tests
+│       ├── src/
+│       └── README.md
+│
+├── python/                # projet Python complet (TP de référence)
+│   ├── src/               # une classe par fichier + main + figures
+│   ├── results/           # traces CSV + tableau de métriques
+│   ├── figures/           # graphiques PNG
+│   ├── report/            # rapport LaTeX + PDF compilé
+│   └── README.md
+│
+├── docs/                  # documents pédagogiques
+│   ├── Seance1_Pedagogique.docx
+│   └── make_doc.py        # script de génération du .docx
+│
+└── README.md              # ce fichier
 ```
 
-## Compiler et lancer
+> **Séances cumulatives** : chaque dossier `java/seanceN/` est autonome et
+> compilable seul. La séance 2 reprend les classes de la séance 1 (inchangées)
+> et y ajoute les nouvelles. On voit ainsi l'avancement séance par séance.
 
+## Démarrage rapide
+
+**Java — Séance courante (2)**
 ```bash
-cd src
-
-# Compilation (une commande compile toutes les classes)
+cd java/seance2/src
 javac -encoding UTF-8 *.java
-
-# Exécution avec assertions activées (-ea)
 java -ea Main
 ```
 
-## Ce qui est testé (Séance 1)
+**Python — projet complet**
+```bash
+cd python/src
+python3 main.py all      # tests + trace + simulations
+python3 figures.py       # graphiques
+```
 
-| Test | Ce qu'il vérifie |
-|------|-----------------|
-| `testMessage()` | création, getters, `setTimestamp`, `printMessage` |
-| `testEvent()` | constructeur, `setEventType`, `setEventTime`, `printEvent`, trace CSV |
-| `testScheduler()` | insertion de 4 événements dans le désordre → extraction chronologique |
+## Avancement
 
-## Choix d'implémentation : Scheduler
+| Séance | Classes | État |
+|:------:|---------|:----:|
+| 1 | Message, Event, Scheduler (+ Main/trace/tests) | ✅ |
+| 2 | Client, Queue, Server (+ tests) | ✅ |
+| 3 | Engine, Gateway + simulations M/M/1, M/M/1/K, M/M/c/K | à faire (Java) |
 
-Le sujet interdit `sort()` à chaque insertion. On utilise `java.util.PriorityQueue`
-(tas binaire min-heap) :
-- `addEvent` : O(log n) — le tas se réorganise automatiquement ;
-- `getEvent` : O(log n) — extrait toujours l'événement le plus proche.
-
-L'ordre est défini par `Event.compareTo()` : chronologique, puis par `eventID`
-(départage stable en cas d'égalité de temps).
+La version **Python** couvre déjà l'intégralité du TP (toutes les séances et les
+simulations), elle sert de référence ; la version **Java** est construite
+progressivement séance par séance.

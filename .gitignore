@@ -1,1 +1,9 @@
+# Java
 *.class
+
+# Python
+__pycache__/
+*.pyc
+
+# LibreOffice / fichiers temporaires
+.~lock.*#
