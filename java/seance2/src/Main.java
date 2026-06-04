@@ -25,9 +25,10 @@ public class Main {
 
         // Message
         Message m = new Message(1, 1, 0);
-        m.setTimestamp(1.202);
+        m.setSendTime(1.202);
+        m.setArrivedTime(1.916);
         m.printMessage();
-        assert m.getMessageID() == 1 && Math.abs(m.getTimestamp() - 1.202) < 1e-9;
+        assert m.getMessageID() == 1 && Math.abs(m.getSendTime() - 1.202) < 1e-9;
 
         // Event
         Event e = new Event(10, EventType.SEND_MSG, 1.202, m);
@@ -60,13 +61,15 @@ public class Main {
         double lambda = 4.0;                       // taux : 4 msg/s -> moyenne 1/4 = 0,25 s
         Client c = new Client(1, NODE_GATEWAY, lambda, rng);
 
-        // Génération de quelques messages : les IDs doivent s'incrémenter
-        Message m1 = c.generateMessage();
-        Message m2 = c.generateMessage();
+        // Génération de quelques messages : les IDs doivent s'incrémenter,
+        // et le sendTime fourni doit être bien renseigné.
+        Message m1 = c.generateMessage(0.500);
+        Message m2 = c.generateMessage(1.250);
         System.out.print("1er message : "); m1.printMessage();
         System.out.print("2e  message : "); m2.printMessage();
         assert m1.getMessageID() == 1 && m2.getMessageID() == 2 : "IDs non incrementaux";
         assert m1.getSource() == 1 && m1.getDestination() == 0  : "source/destination KO";
+        assert Math.abs(m1.getSendTime() - 0.500) < 1e-9 : "sendTime non renseigne";
 
         // Vérification de la loi : sur un grand échantillon, la moyenne des
         // inter-arrivées doit approcher 1/lambda = 0,25 s.

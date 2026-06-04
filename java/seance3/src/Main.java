@@ -50,18 +50,19 @@ public class Main {
         Message m2 = new Message(2, 1, 0);
         Message m3 = new Message(3, 1, 0);
 
-        // m1 : serveur libre -> service immédiat
-        Gateway.ServiceStart s1 = g.receive(m1);
+        // m1 : serveur libre -> service immédiat (arrivée à t=1.0)
+        Gateway.ServiceStart s1 = g.receive(m1, 1.0);
         g.printGateway();
         assert s1 != null && g.nbInSystem() == 1 && g.nbBusy() == 1 : "m1 devrait etre servi";
+        assert Math.abs(m1.getArrivedTime() - 1.0) < 1e-9 : "arrivedTime non renseigne";
 
-        // m2 : serveur occupé, système pas plein (1<2) -> file
-        Gateway.ServiceStart s2 = g.receive(m2);
+        // m2 : serveur occupé, système pas plein (1<2) -> file (arrivée à t=2.0)
+        Gateway.ServiceStart s2 = g.receive(m2, 2.0);
         g.printGateway();
         assert s2 == null && g.nbInQueue() == 1 && g.nbInSystem() == 2 : "m2 devrait etre en file";
 
-        // m3 : système plein (2>=2) -> rejet
-        Gateway.ServiceStart s3 = g.receive(m3);
+        // m3 : système plein (2>=2) -> rejet (arrivée à t=3.0)
+        Gateway.ServiceStart s3 = g.receive(m3, 3.0);
         g.printGateway();
         assert s3 == null && g.getRejets() == 1 && g.nbInSystem() == 2 : "m3 devrait etre rejete";
 

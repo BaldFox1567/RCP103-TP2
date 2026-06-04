@@ -37,12 +37,14 @@ public class Client {
     }
 
     /**
-     * Crée le prochain message à émettre. Le timestamp (heure de création)
-     * sera posé par l'appelant au moment de l'émission.
+     * Crée le prochain message à émettre, en renseignant son sendTime
+     * (l'instant d'envoi/création). L'arrivedTime sera posé à la réception.
      */
-    public Message generateMessage() {
+    public Message generateMessage(double sendTime) {
         compteurMsg++;
-        return new Message(compteurMsg, clientID, destination);
+        Message msg = new Message(compteurMsg, clientID, destination);
+        msg.setSendTime(sendTime);
+        return msg;
     }
 
     public int getClientID() { return clientID; }

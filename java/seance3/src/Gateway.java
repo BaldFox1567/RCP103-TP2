@@ -101,7 +101,8 @@ public class Gateway {
      *   - serveur libre  -> service immédiat, retourne le ServiceStart ;
      *   - sinon          -> mise en file, retourne null.
      */
-    public ServiceStart receive(Message msg) {
+    public ServiceStart receive(Message msg, double t) {
+        msg.setArrivedTime(t);   // instant d'arrivée à la passerelle
         arrivees++;
         if (isFull()) {
             rejets++;

@@ -19,10 +19,11 @@ import java.util.Random;
  *
  * Modèle mesuré : le « système » est la passerelle (file + serveurs). Les
  * nombres N_systeme et N_file changent aux instants RECV (arrivée admise) et
- * DEPT (départ). Le temps de séjour est mesuré de l'arrivée à la passerelle au
- * départ. Le délai de propagation étant CONSTANT, l'instant d'arrivée vaut
- * (timestamp de création + délai) ; il décale les arrivées sans modifier les
- * métriques de file — c'est pourquoi W se compare directement à la théorie M/M/c.
+ * DEPT (départ). Chaque message porte deux instants : sendTime (envoi par le
+ * client) et arrivedTime (réception à la passerelle). Le temps de séjour est
+ * mesuré de l'arrivée à la passerelle au départ (sortie - arrivedTime) : le
+ * délai de propagation, constant, décale seulement les arrivées et n'entre donc
+ * pas dans W — c'est pourquoi W se compare directement à la théorie M/M/c.
  */
 public class Engine {
 
@@ -153,11 +154,10 @@ public class Engine {
         double sommeSejour = 0.0;  long nbSejour = 0;
         double sommeAttente = 0.0; long nbAttente = 0;
 
-        // Amorçage : premier SEND de chaque client
+        // Amorçage : premier SEND de chaque client (sendTime = instant d'envoi)
         for (Client c : clients.values()) {
-            Message m = c.generateMessage();
             double t0 = c.nextDelay();
-            m.setTimestamp(t0);
+            Message m = c.generateMessage(t0);
             scheduler.addEvent(new Event(nextEventId(), EventType.SEND_MSG, t0, m));
         }
 
@@ -178,11 +178,10 @@ public class Engine {
                     Message m = e.getMessage();
                     // Réception à la passerelle après le délai de propagation
                     scheduler.addEvent(new Event(nextEventId(), EventType.RECV_MSG, t + D, m));
-                    // Prochain SEND du même client
+                    // Prochain SEND du même client (sendTime = instant d'envoi)
                     Client c = clients.get(m.getSource());
-                    Message mn = c.generateMessage();
                     double tn = t + c.nextDelay();
-                    mn.setTimestamp(tn);
+                    Message mn = c.generateMessage(tn);
                     scheduler.addEvent(new Event(nextEventId(), EventType.SEND_MSG, tn, mn));
                     generateTrace(e, m.getSource());
                     break;
@@ -190,7 +189,8 @@ public class Engine {
 
                 case RECV_MSG: {
                     Message m = e.getMessage();
-                    Gateway.ServiceStart ss = gateway.receive(m);
+                    // La passerelle renseigne arrivedTime = t et applique la logique
+                    Gateway.ServiceStart ss = gateway.receive(m, t);
                     if (ss != null) {                 // service immédiat
                         sommeAttente += 0.0; nbAttente++;   // attente nulle
                         double st = ss.server.serviceTime();
@@ -203,11 +203,11 @@ public class Engine {
 
                 case MSG_DEPT: {
                     Message m = e.getMessage();
-                    double arrivee = m.getTimestamp() + D;   // instant d'arrivée à la passerelle
-                    sommeSejour += (t - arrivee); nbSejour++;
+                    // Temps de séjour dans le système = sortie - arrivée à la passerelle
+                    sommeSejour += (t - m.getArrivedTime()); nbSejour++;
                     Gateway.ServiceStart ss = gateway.depart(m);
                     if (ss != null) {                 // on sert le suivant de la file
-                        double w = t - (ss.msg.getTimestamp() + D);
+                        double w = t - ss.msg.getArrivedTime();   // attente en file
                         sommeAttente += w; nbAttente++;
                         double st = ss.server.serviceTime();
                         scheduler.addEvent(new Event(nextEventId(), EventType.MSG_DEPT, t + st, ss.msg));

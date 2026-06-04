@@ -47,19 +47,21 @@ public class Main {
 
         // Création et affichage initial
         Message m = new Message(1, 1, 0);
-        System.out.print("Avant setTimestamp : ");
+        System.out.print("Avant renseignement : ");
         m.printMessage();
 
-        // Mise à jour du timestamp (comme à l'émission)
-        m.setTimestamp(1.202);
-        System.out.print("Après setTimestamp : ");
+        // Renseignement des instants : envoi (sendTime) puis arrivée (arrivedTime)
+        m.setSendTime(1.202);
+        m.setArrivedTime(1.916);
+        System.out.print("Après renseignement : ");
         m.printMessage();
 
         // Vérifications
         assert m.getMessageID()   == 1   : "messageID incorrect";
         assert m.getSource()      == 1   : "source incorrecte";
         assert m.getDestination() == 0   : "destination incorrecte";
-        assert Math.abs(m.getTimestamp() - 1.202) < 1e-9 : "timestamp incorrect";
+        assert Math.abs(m.getSendTime()    - 1.202) < 1e-9 : "sendTime incorrect";
+        assert Math.abs(m.getArrivedTime() - 1.916) < 1e-9 : "arrivedTime incorrect";
 
         System.out.println("→ testMessage : OK\n");
     }
@@ -73,7 +75,7 @@ public class Main {
         System.out.println("========================================");
 
         Message m = new Message(1, 1, 0);
-        m.setTimestamp(1.202);
+        m.setSendTime(1.202);
 
         Event e = new Event(10, EventType.SEND_MSG, 1.202, m);
         System.out.print("Événement créé : ");
