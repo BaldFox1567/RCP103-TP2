@@ -7,3 +7,4 @@ __pycache__/
 
 # LibreOffice / fichiers temporaires
 .~lock.*#
+build/

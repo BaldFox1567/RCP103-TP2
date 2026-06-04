@@ -10,12 +10,17 @@ Le dépôt sépare clairement le **Java** (réalisé séance par séance) du **P
 
 ```
 RCP103-TP2/
-├── java/                  # implémentation Java, par séance (cumulative)
+├── java/                  # implémentation Java, par séance
 │   ├── seance1/           # Message, Event, Scheduler + tests
 │   │   ├── src/
 │   │   └── README.md
-│   └── seance2/           # = S1 + Client, Queue, Server + tests
-│       ├── src/
+│   ├── seance2/           # = S1 + Client, Queue, Server + tests (cumulatif)
+│   │   ├── src/
+│   │   └── README.md
+│   └── seance3/           # Gateway, Engine, Theorie + Main de simulation
+│       ├── src/           # réutilise S1/S2 via -sourcepath (pas de copie)
+│       ├── results/       # traces CSV + tableau de métriques
+│       ├── figures/       # graphiques éventuels
 │       └── README.md
 │
 ├── python/                # projet Python complet (TP de référence)
@@ -38,9 +43,16 @@ RCP103-TP2/
 
 ## Démarrage rapide
 
-**Java — Séance courante (2)**
+**Java — Séance courante (3 : simulateur complet)**
 ```bash
-cd java/seance2/src
+cd java/seance3
+javac -encoding UTF-8 -sourcepath ../seance2/src -d build src/*.java
+java -ea -cp build Main          # tests + campagne de simulations
+```
+
+**Java — Séances 1 et 2 (autonomes)**
+```bash
+cd java/seance1/src   # ou seance2/src
 javac -encoding UTF-8 *.java
 java -ea Main
 ```
@@ -58,8 +70,9 @@ python3 figures.py       # graphiques
 |:------:|---------|:----:|
 | 1 | Message, Event, Scheduler (+ Main/trace/tests) | ✅ |
 | 2 | Client, Queue, Server (+ tests) | ✅ |
-| 3 | Engine, Gateway + simulations M/M/1, M/M/1/K, M/M/c/K | à faire (Java) |
+| 3 | Engine, Gateway + simulations M/M/1, M/M/1/K, M/M/c/K | ✅ |
 
-La version **Python** couvre déjà l'intégralité du TP (toutes les séances et les
-simulations), elle sert de référence ; la version **Java** est construite
-progressivement séance par séance.
+Les **trois séances Java sont réalisées** : le simulateur est complet et ses
+résultats concordent avec la théorie (accord < 1 %, loi de Little vérifiée). La
+version **Python** couvre le même périmètre et sert de référence croisée
+(notamment pour les graphiques et le rapport).
