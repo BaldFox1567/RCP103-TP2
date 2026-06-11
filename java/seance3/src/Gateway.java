@@ -1,110 +1,146 @@
 /**
- * Gateway.java — La passerelle IoT, c'est-à-dire le système étudié.
+ * La passerelle IoT, c'est-a-dire le systeme etudie : une file d'attente,
+ * un ou plusieurs serveurs, et une capacite maximale K (messages en file +
+ * en service). capacity = 0 signifie capacite infinie (M/M/1).
  *
- * Elle regroupe la file d'attente (Queue), un ou plusieurs serveurs (Server)
- * et une capacité maximale K (messages en file + en service). capacity = 0
- * signifie capacité infinie (M/M/1).
- *
- * La passerelle porte l'état du système (serveurs occupés, taille de la file)
- * et les compteurs (arrivées, acceptés, rejetés, départs). La logique des
- * événements RECV_MSG et MSG_DEPT est appliquée par l'Engine, qui interroge
- * la passerelle : système plein ? serveur libre ? file vide ?
+ * La passerelle porte l'etat du systeme et les compteurs. La logique des
+ * evenements RECV_MSG et MSG_DEPT est appliquee par l'Engine, qui interroge
+ * la passerelle : systeme plein ? serveur libre ? file vide ?
  */
 public class Gateway {
 
-    private Queue    queue;        // la file d'attente partagée
-    private Server[] servers;      // le ou les serveurs
-    private int      capacity;     // capacité K du système (0 = infinie)
+    private Queue queue;
+    private Server[] servers;
+    private int capacity;
 
     // Compteurs de la passerelle
-    private int nbArrivals;        // messages arrivés (RECV_MSG)
-    private int nbAccepted;        // messages admis (service ou file)
-    private int nbRejected;        // messages rejetés (système plein)
-    private int nbDepartures;      // messages servis et sortis (MSG_DEPT)
+    private int nbArrivals;
+    private int nbAccepted;
+    private int nbRejected;
+    private int nbDepartures;
 
     public Gateway(int nbServers, int capacity, double mu) {
-        this.queue    = new Queue();
+        this.queue = new Queue();
         this.capacity = capacity;
-        this.servers  = new Server[nbServers];
+        this.servers = new Server[nbServers];
+
         for (int i = 0; i < nbServers; i++) {
             this.servers[i] = new Server(i + 1, mu);
         }
-        this.nbArrivals   = 0;
-        this.nbAccepted   = 0;
-        this.nbRejected   = 0;
+
+        this.nbArrivals = 0;
+        this.nbAccepted = 0;
+        this.nbRejected = 0;
         this.nbDepartures = 0;
     }
 
-    // --- État instantané du système ---
-
-    /** Nombre de serveurs occupés. */
+    // Nombre de serveurs occupes
     public int GetNbBusyServers() {
         int n = 0;
-        for (Server s : servers) {
-            if (s.IsBusy()) {
-                n++;
+
+        for (int i = 0; i < this.servers.length; i++) {
+            if (this.servers[i].IsBusy()) {
+                n = n + 1;
             }
         }
+
         return n;
     }
 
-    /** Nombre de messages en attente dans la file. */
+    // Nombre de messages en attente dans la file
     public int GetNbInQueue() {
-        return queue.GetSize();
+        return this.queue.GetSize();
     }
 
-    /** Nombre de messages dans le système = en service + en file. */
+    // Nombre de messages dans le systeme = en service + en file
     public int GetNbInSystem() {
-        return GetNbBusyServers() + queue.GetSize();
+        return GetNbBusyServers() + this.queue.GetSize();
     }
 
-    /** Vrai si le système est plein (uniquement pour les modèles bornés /K). */
+    // Vrai si le systeme est plein (uniquement pour les modeles bornes /K)
     public boolean IsFull() {
-        return capacity > 0 && GetNbInSystem() >= capacity;
+        return this.capacity > 0 && GetNbInSystem() >= this.capacity;
     }
 
-    /** Retourne le premier serveur libre, ou null s'ils sont tous occupés. */
+    // Retourne le premier serveur libre, ou null s'ils sont tous occupes
     public Server GetFreeServer() {
-        for (Server s : servers) {
-            if (!s.IsBusy()) {
-                return s;
+        for (int i = 0; i < this.servers.length; i++) {
+            if (!this.servers[i].IsBusy()) {
+                return this.servers[i];
             }
         }
+
         return null;
     }
 
-    /** Retourne le premier serveur occupé, ou null (utile à la fin d'un service). */
+    // Retourne le premier serveur occupe, ou null (utile a la fin d'un service)
     public Server GetBusyServer() {
-        for (Server s : servers) {
-            if (s.IsBusy()) {
-                return s;
+        for (int i = 0; i < this.servers.length; i++) {
+            if (this.servers[i].IsBusy()) {
+                return this.servers[i];
             }
         }
+
         return null;
     }
 
-    public Queue GetQueue()    { return queue; }
-    public int   GetCapacity() { return capacity; }
-    public int   GetNbServers(){ return servers.length; }
+    // Getters
+    public Queue GetQueue() {
+        return this.queue;
+    }
 
-    // --- Compteurs ---
-    public void MessageArrival()   { nbArrivals++; }
-    public void MessageAccepted()  { nbAccepted++; }
-    public void MessageRejected()  { nbRejected++; }
-    public void MessageDeparture() { nbDepartures++; }
+    public int GetCapacity() {
+        return this.capacity;
+    }
 
-    public int GetNbArrivals()   { return nbArrivals; }
-    public int GetNbAccepted()   { return nbAccepted; }
-    public int GetNbRejected()   { return nbRejected; }
-    public int GetNbDepartures() { return nbDepartures; }
+    public int GetNbServers() {
+        return this.servers.length;
+    }
 
-    /** Affiche l'état courant de la passerelle. */
+    // Compteurs
+    public void MessageArrival() {
+        this.nbArrivals = this.nbArrivals + 1;
+    }
+
+    public void MessageAccepted() {
+        this.nbAccepted = this.nbAccepted + 1;
+    }
+
+    public void MessageRejected() {
+        this.nbRejected = this.nbRejected + 1;
+    }
+
+    public void MessageDeparture() {
+        this.nbDepartures = this.nbDepartures + 1;
+    }
+
+    public int GetNbArrivals() {
+        return this.nbArrivals;
+    }
+
+    public int GetNbAccepted() {
+        return this.nbAccepted;
+    }
+
+    public int GetNbRejected() {
+        return this.nbRejected;
+    }
+
+    public int GetNbDepartures() {
+        return this.nbDepartures;
+    }
+
+    // Affichage
     public void PrintGateway() {
-        String cap = (capacity > 0) ? String.valueOf(capacity) : "infinie";
-        System.out.println("Gateway : serveurs=" + servers.length
-                + " (occupes=" + GetNbBusyServers() + "), file=" + GetNbInQueue()
-                + ", systeme=" + GetNbInSystem() + ", capacite=" + cap
-                + " | arrives=" + nbArrivals + " acceptes=" + nbAccepted
-                + " rejetes=" + nbRejected + " sortis=" + nbDepartures);
+        System.out.println("Gateway");
+        System.out.println("  serveurs   : " + this.servers.length
+                + " (occupes=" + GetNbBusyServers() + ")");
+        System.out.println("  file       : " + GetNbInQueue());
+        System.out.println("  systeme    : " + GetNbInSystem()
+                + (this.capacity > 0 ? " / " + this.capacity : " (capacite infinie)"));
+        System.out.println("  arrives    : " + this.nbArrivals);
+        System.out.println("  acceptes   : " + this.nbAccepted);
+        System.out.println("  rejetes    : " + this.nbRejected);
+        System.out.println("  sortis     : " + this.nbDepartures);
     }
 }

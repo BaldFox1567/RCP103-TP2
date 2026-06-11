@@ -13,7 +13,7 @@ l'objectif est de valider les structures de base et leur enchaînement.
 | `Message.java` | l'entité qui circule : `messageID`, `source`, `destination`, `sendTime`, `arrivedTime` ; `PrintMessage()`, `serviceStart()` |
 | `Event.java` | événement daté : `eventID`, `eventType`, `eventTime`, `message` ; types en constantes (`SEND_MSG`, `RECV_MSG`, `MSG_DEPT`) validés par `IsValidEventType()` |
 | `Scheduler.java` | liste d'événements triée par date : insertion ordonnée directe dans `AddEvent()` (aucun `sort()`), `GetEvent()`, `HasEvents()`, `PrintScheduler()` |
-| `Engine.java` | classe principale : `main`, durée de simulation, scheduler, trace en mémoire, `GenerateTrace()`, les quatre tests et `Run()` |
+| `Engine.java` | classe principale : `main`, durée de simulation, scheduler, trace en mémoire, `GenerateTrace(event, node)`, les quatre tests et `Run()` |
 
 ## Compiler et lancer
 
@@ -30,9 +30,10 @@ aux dates 1.202, 2.320, 0.950 insérés dans le désordre, ressortis triés) et
 ## Gestion de la trace
 
 La trace est **stockée en mémoire** puis réutilisée pour deux sorties :
-affichage console et export CSV. Six champs : `time, node, event, src, dst,
-msgID`. Le nœud concerné : la source pour un `SEND_MSG` (le client), sinon la
-destination, c'est-à-dire la passerelle (nœud 0).
+affichage console en tableau (avec coloration par type d'événement) et export
+CSV. Six champs : `time, node, event, src, dst, msgID`. Le nœud concerné : la
+source pour un `SEND_MSG` (le client), sinon la destination, c'est-à-dire la
+passerelle (nœud 0).
 
 ## Choix d'implémentation : Scheduler
 

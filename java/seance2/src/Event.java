@@ -1,64 +1,89 @@
-import java.util.Locale;
-
-/**
- * Event.java — Un événement daté de la simulation.
- *
- * Membres : eventID, eventType, eventTime, message associé.
- * Les trois types autorisés sont définis comme constantes :
- * SEND_MSG, RECV_MSG, MSG_DEPT.
- *
- * À la construction comme dans le setter, le type passe par
- * IsValidEventType() : s'il ne correspond à aucun des trois types attendus,
- * il est remplacé par une chaîne vide. Cela évite de se retrouver avec un
- * événement au type incohérent (faute de frappe dans un test, etc.) et
- * fiabilise les ajouts au scheduler.
- */
 public class Event {
 
-    // Les trois types d'événements du modèle du cours
-    public static final String SEND_MSG = "SEND_MSG";  // un client envoie un message
-    public static final String RECV_MSG = "RECV_MSG";  // la passerelle reçoit le message
-    public static final String MSG_DEPT = "MSG_DEPT";  // la passerelle termine le traitement
+    public static final String SEND_MSG = "SEND_MSG";
+    public static final String RECV_MSG = "RECV_MSG";
+    public static final String MSG_DEPT = "MSG_DEPT";
 
-    private int     eventID;    // identifiant unique de l'événement
-    private String  eventType;  // SEND_MSG, RECV_MSG ou MSG_DEPT
-    private double  eventTime;  // date de l'événement
-    private Message message;    // message concerné
+    private int eventID;
+    private String eventType;
+    private double eventTime;
+    private Message message;
 
-    /** Constructeur : Event(id, type, time, msg). Le type est validé. */
+    public Event() {
+        this.eventID = 0;
+        this.eventType = "";
+        this.eventTime = 0.0;
+        this.message = null;
+    }
+
     public Event(int eventID, String eventType, double eventTime, Message message) {
-        this.eventID   = eventID;
-        this.eventType = IsValidEventType(eventType) ? eventType : "";
+        this.eventID = eventID;
+
+        if (IsValidEventType(eventType)) {
+            this.eventType = eventType;
+        } else {
+            this.eventType = "";
+        }
+
         this.eventTime = eventTime;
-        this.message   = message;
+        this.message = message;
     }
 
-    /** Vrai si le type correspond à l'un des trois types attendus. */
-    public boolean IsValidEventType(String type) {
-        return SEND_MSG.equals(type) || RECV_MSG.equals(type) || MSG_DEPT.equals(type);
+    private boolean IsValidEventType(String eventType) {
+        return eventType.equals(SEND_MSG)
+                || eventType.equals(RECV_MSG)
+                || eventType.equals(MSG_DEPT);
     }
 
-    // --- Getters ---
-    public int     GetEventID()   { return eventID; }
-    public String  GetEventType() { return eventType; }
-    public double  GetEventTime() { return eventTime; }
-    public Message GetMessage()   { return message; }
-
-    // --- Setters ---
-    public void SetEventID(int id)        { this.eventID = id; }
-    public void SetEventTime(double t)    { this.eventTime = t; }
-    public void SetMessage(Message m)     { this.message = m; }
-
-    /** Le type est validé : un type inconnu est remplacé par une chaîne vide. */
-    public void SetEventType(String type) {
-        this.eventType = IsValidEventType(type) ? type : "";
+    // Getters
+    public int GetEventID() {
+        return this.eventID;
     }
 
-    /** Affiche tous les champs de l'événement. */
+    public String GetEventType() {
+        return this.eventType;
+    }
+
+    public double GetEventTime() {
+        return this.eventTime;
+    }
+
+    public Message GetMessage() {
+        return this.message;
+    }
+
+    // Setters
+    public void SetEventID(int eventID) {
+        this.eventID = eventID;
+    }
+
+    public void SetEventType(String eventType) {
+        if (IsValidEventType(eventType)) {
+            this.eventType = eventType;
+        } else {
+            this.eventType = "";
+        }
+    }
+
+    public void SetEventTime(double eventTime) {
+        this.eventTime = eventTime;
+    }
+
+    public void SetMessage(Message message) {
+        this.message = message;
+    }
+
+    // Affichage
     public void PrintEvent() {
-        String msgID = (message != null) ? String.valueOf(message.GetMessageID()) : "-";
-        System.out.printf(Locale.ROOT,
-            "Event #%d : type=%-8s, eventTime=%.3f, messageID=%s%n",
-            eventID, eventType, eventTime, msgID);
+        System.out.println("Event");
+        System.out.println("  eventID   : " + this.eventID);
+        System.out.println("  eventType : " + this.eventType);
+        System.out.println("  eventTime : " + this.eventTime);
+
+        if (this.message != null) {
+            System.out.println("  messageID : " + this.message.GetMessageID());
+        } else {
+            System.out.println("  messageID : None");
+        }
     }
 }
