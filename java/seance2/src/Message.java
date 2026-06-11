@@ -1,45 +1,66 @@
 import java.util.Locale;
 
 /**
- * Message.java — Un message IoT circulant dans le simulateur.
+ * Message.java — L'entité qui circule dans le système.
  *
  * Membres : messageID, source, destination, sendTime, arrivedTime.
- *   - sendTime    : instant où le message est envoyé / créé par le client.
- *   - arrivedTime : instant où le message arrive (réception à la passerelle).
+ *   - sendTime    : instant d'envoi du message par le client ;
+ *   - arrivedTime : instant d'arrivée à la passerelle.
  */
 public class Message {
 
     private int    messageID;    // identifiant unique du message
-    private int    source;       // nœud émetteur (clientID)
+    private int    source;       // nœud émetteur (client)
     private int    destination;  // nœud destinataire (0 = passerelle)
-    private double sendTime;     // instant d'envoi / de création (côté client)
-    private double arrivedTime;  // instant d'arrivée à la passerelle (RECV)
+    private double sendTime;     // instant d'envoi
+    private double arrivedTime;  // instant d'arrivée à la passerelle
 
-    // Constructeur : les deux instants sont initialisés à 0, puis renseignés
-    // à l'émission (sendTime) et à la réception (arrivedTime).
-    public Message(int id, int src, int dst) {
-        this.messageID   = id;
-        this.source      = src;
-        this.destination = dst;
+    /** Constructeur par défaut. */
+    public Message() {
+        this.messageID   = 0;
+        this.source      = 0;
+        this.destination = 0;
         this.sendTime    = 0.0;
         this.arrivedTime = 0.0;
     }
 
+    /** Constructeur complet. */
+    public Message(int messageID, int source, int destination,
+                   double sendTime, double arrivedTime) {
+        this.messageID   = messageID;
+        this.source      = source;
+        this.destination = destination;
+        this.sendTime    = sendTime;
+        this.arrivedTime = arrivedTime;
+    }
+
     // --- Getters ---
-    public int    getMessageID()   { return messageID; }
-    public int    getSource()      { return source; }
-    public int    getDestination() { return destination; }
-    public double getSendTime()    { return sendTime; }
-    public double getArrivedTime() { return arrivedTime; }
+    public int    GetMessageID()   { return messageID; }
+    public int    GetSource()      { return source; }
+    public int    GetDestination() { return destination; }
+    public double GetSendTime()    { return sendTime; }
+    public double GetArrivedTime() { return arrivedTime; }
 
     // --- Setters ---
-    public void setSendTime(double t)    { this.sendTime = t; }
-    public void setArrivedTime(double t) { this.arrivedTime = t; }
+    public void SetMessageID(int id)         { this.messageID = id; }
+    public void SetSource(int source)        { this.source = source; }
+    public void SetDestination(int dest)     { this.destination = dest; }
+    public void SetSendTime(double t)        { this.sendTime = t; }
+    public void SetArrivedTime(double t)     { this.arrivedTime = t; }
 
-    /** Affiche tous les membres du message. */
-    public void printMessage() {
+    /**
+     * Remet les deux temps à zéro. Prévue pour réinitialiser les temps au
+     * début du service ; servira dans les séances suivantes.
+     */
+    public void serviceStart() {
+        this.sendTime    = 0.0;
+        this.arrivedTime = 0.0;
+    }
+
+    /** Affiche tous les champs du message. */
+    public void PrintMessage() {
         System.out.printf(Locale.ROOT,
-            "Message #%d : source=%d -> destination=%d, sendTime=%.3f, arrivedTime=%.3f%n",
+            "Message #%d : source=%d, destination=%d, sendTime=%.3f, arrivedTime=%.3f%n",
             messageID, source, destination, sendTime, arrivedTime);
     }
 }

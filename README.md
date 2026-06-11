@@ -11,15 +11,15 @@ Le dépôt sépare clairement le **Java** (réalisé séance par séance) du **P
 ```
 RCP103-TP2/
 ├── java/                  # implémentation Java, par séance
-│   ├── seance1/           # Message, Event, Scheduler + tests
+│   ├── seance1/           # Message, Event, Scheduler, Engine (main+trace+tests)
 │   │   ├── src/
 │   │   └── README.md
 │   ├── seance2/           # = S1 + Client, Queue, Server + tests (cumulatif)
 │   │   ├── src/
 │   │   └── README.md
-│   └── seance3/           # Gateway, Engine, Theorie + Main de simulation
-│       ├── src/           # réutilise S1/S2 via -sourcepath (pas de copie)
-│       ├── results/       # traces CSV + tableau de métriques
+│   └── seance3/           # = S2 + Gateway, Engine (boucle), Theorie + simulations
+│       ├── src/           # dossier autonome (copies des classes précédentes)
+│       ├── results/       # tableau de métriques (resultats.csv)
 │       ├── figures/       # graphiques éventuels
 │       └── README.md
 │
@@ -46,15 +46,15 @@ RCP103-TP2/
 **Java — Séance courante (3 : simulateur complet)**
 ```bash
 cd java/seance3
-javac -encoding UTF-8 -sourcepath ../seance2/src -d build src/*.java
-java -ea -cp build Main          # tests + campagne de simulations
+javac -encoding UTF-8 src/*.java
+java -cp src Engine              # tests + campagne de simulations
 ```
 
 **Java — Séances 1 et 2 (autonomes)**
 ```bash
 cd java/seance1/src   # ou seance2/src
 javac -encoding UTF-8 *.java
-java -ea Main
+java Engine
 ```
 
 **Python — projet complet**
@@ -68,9 +68,9 @@ python3 figures.py       # graphiques
 
 | Séance | Classes | État |
 |:------:|---------|:----:|
-| 1 | Message, Event, Scheduler (+ Main/trace/tests) | ✅ |
+| 1 | Message, Event, Scheduler, Engine (main + trace + tests) | ✅ |
 | 2 | Client, Queue, Server (+ tests) | ✅ |
-| 3 | Engine, Gateway + simulations M/M/1, M/M/1/K, M/M/c/K | ✅ |
+| 3 | Gateway, Engine (boucle) + simulations M/M/1, M/M/1/K, M/M/c/K | ✅ |
 
 Les **trois séances Java sont réalisées** : le simulateur est complet et ses
 résultats concordent avec la théorie (accord < 1 %, loi de Little vérifiée). La

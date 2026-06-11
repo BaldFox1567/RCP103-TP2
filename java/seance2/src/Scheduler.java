@@ -1,55 +1,81 @@
-import java.util.PriorityQueue;
+import java.util.ArrayList;
+import java.util.Locale;
 
 /**
- * Scheduler.java — Ordonnanceur d'événements (liste chronologique).
+ * Scheduler.java — L'ordonnanceur : maintient la liste des événements futurs,
+ * triée par date croissante.
  *
- * Choix d'implémentation : PriorityQueue (tas binaire min-heap de Java).
- *   - addEvent  : insertion en O(log n) — le tas se réorganise seul, sans sort().
- *   - getEvent  : extraction du minimum (= l'événement le plus proche) en O(log n).
- * C'est exactement ce que le sujet demande : "insertion directe au bon endroit,
- * interdit d'appeler sort() à chaque insertion".
- *
- * L'ordre est défini par Event.compareTo() : chronologique, puis par eventID.
+ * Il ne faut pas re-trier toute la liste à chaque ajout : AddEvent() fait une
+ * insertion ordonnée directe. La liste reste ainsi triée en permanence, sans
+ * aucun appel à sort(). Comme la comparaison se fait directement sur les dates
+ * dans AddEvent(), la classe Event n'a pas besoin d'être comparable.
  */
 public class Scheduler {
 
-    // Tas binaire : le premier élément est toujours l'événement le plus tôt
-    private PriorityQueue<Event> tas;
-    private double tempsCourant;  // temps du dernier événement extrait
+    private ArrayList<Event> eventList;   // liste des événements, toujours triée
+    private double           currentTime; // temps courant de la simulation
 
     public Scheduler() {
-        this.tas          = new PriorityQueue<>();
-        this.tempsCourant = 0.0;
+        this.eventList   = new ArrayList<Event>();
+        this.currentTime = 0.0;
     }
 
     /**
-     * Insère un événement au bon endroit dans le tas (O(log n)).
-     * La PriorityQueue garantit l'ordre — pas de sort() appelé.
+     * Insertion ordonnée directe :
+     *   - si l'événement est nul, il est ignoré ;
+     *   - si la liste est vide, il est ajouté tel quel ;
+     *   - sinon, on parcourt la liste jusqu'au premier événement dont la date
+     *     est plus grande et on insère juste avant ;
+     *   - si aucun événement plus tardif n'est trouvé, il est placé en fin de liste.
      */
-    public void addEvent(Event e) {
-        tas.offer(e);
-    }
-
-    /**
-     * Extrait et retourne le prochain événement (le plus tôt).
-     * Met à jour le temps courant.
-     * Retourne null si la liste est vide.
-     */
-    public Event getEvent() {
-        Event e = tas.poll();
-        if (e != null) {
-            tempsCourant = e.getEventTime();
+    public void AddEvent(Event e) {
+        if (e == null) {
+            return;
         }
+        if (eventList.isEmpty()) {
+            eventList.add(e);
+            return;
+        }
+        for (int i = 0; i < eventList.size(); i++) {
+            if (eventList.get(i).GetEventTime() > e.GetEventTime()) {
+                eventList.add(i, e);   // insertion juste avant le premier plus tardif
+                return;
+            }
+        }
+        eventList.add(e);              // aucun plus tardif : en fin de liste
+    }
+
+    /**
+     * Retire et renvoie le premier élément (le plus tôt),
+     * puis met à jour currentTime. Renvoie null si la liste est vide.
+     */
+    public Event GetEvent() {
+        if (eventList.isEmpty()) {
+            return null;
+        }
+        Event e = eventList.remove(0);
+        currentTime = e.GetEventTime();
         return e;
     }
 
-    /** Retourne le temps courant (celui du dernier événement extrait). */
-    public double getCurrentTime() {
-        return tempsCourant;
+    /** Retourne le temps courant. */
+    public double GetCurrentTime() {
+        return currentTime;
     }
 
-    /** Indique s'il reste des événements à traiter. */
-    public boolean hasEvents() {
-        return !tas.isEmpty();
+    /** Indique s'il reste des événements. */
+    public boolean HasEvents() {
+        return !eventList.isEmpty();
+    }
+
+    /** Affiche le contenu de la liste. */
+    public void PrintScheduler() {
+        System.out.printf(Locale.ROOT,
+            "Scheduler : %d evenement(s), currentTime=%.3f%n",
+            eventList.size(), currentTime);
+        for (Event e : eventList) {
+            System.out.print("   ");
+            e.PrintEvent();
+        }
     }
 }

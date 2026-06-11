@@ -3,42 +3,31 @@
 RCP103 / NCA — Cours 09 : Simulateur à événements discrets
 P. B. Velloso & A. Hidouri
 
-Projet **cumulatif** : ce dossier contient toutes les classes de la Séance 1
-(inchangées) **plus** les trois nouvelles classes de la Séance 2. Il compile et
-s'exécute donc tout seul.
+Séance cumulative : reprend les classes de la séance 1 (inchangées) et ajoute
+les trois composants du système. Le simulateur ne tourne toujours pas : la
+boucle viendra à la séance 3.
 
-## Contenu (`src/`)
+## Contenu (`src/`) — nouveautés
 
-| Fichier | Séance | Rôle |
-|---------|:------:|------|
-| `EventType.java`, `Message.java`, `Event.java`, `Scheduler.java` | S1 | briques de base (rappel) |
-| `Client.java` | **S2** | source de messages ; inter-arrivées exp. de moyenne 1/λ |
-| `Queue.java` | **S2** | file d'attente FIFO (`ArrayDeque`) |
-| `Server.java` | **S2** | serveur ; temps de service exp. de moyenne 1/μ |
-| `Main.java` | **S2** | rappel S1 + `testClient()`, `testQueue()`, `testServer()` |
+| Fichier | Rôle |
+|---------|------|
+| `Client.java` | générateur de messages : `clientID`, `destination`, `lambda` ; inter-arrivées exponentielles `GetInterArrivalTime()` (moyenne 1/λ), `GenerateMessage()` |
+| `Queue.java` | file FIFO de la passerelle : `AddMessage()`, `GetMessage()`, `IsEmpty()`, `GetSize()`, `PrintQueue()` |
+| `Server.java` | serveur de traitement : `serverID`, `mu`, `busy` ; temps de service exponentiel `GetServiceTime()` (moyenne 1/µ) |
+| `Engine.java` | classe principale : trace + tests des séances 1 et 2 ; `Run()` appelle `Test_Client`, `Test_Queue`, `Test_Server` |
+
+(+ copies inchangées de `Message.java`, `Event.java`, `Scheduler.java`.)
 
 ## Compiler et lancer
 
 ```bash
 cd src
 javac -encoding UTF-8 *.java
-java -ea Main
+java Engine
 ```
 
-## Ce que les tests vérifient
+## Remarque sur λ et µ
 
-- **Client** : IDs de messages incrémentaux ; sur 200 000 tirages, la moyenne des
-  inter-arrivées ≈ 1/λ = 0,25 s (λ=4). Confirme que λ est bien un **taux**.
-- **Queue** : ordre FIFO (premier entré, premier sorti), `size`, `isEmpty`.
-- **Server** : états libre/occupé ; moyenne des temps de service ≈ 1/μ = 0,125 s (μ=8).
-
-## Note sur l'aléatoire
-
-Pas de numpy en Java : les lois exponentielles sont générées par transformée
-inverse `-ln(1-U)/taux` (moyenne = 1/taux), avec `java.util.Random` graine fixée
-pour la reproductibilité.
-
-## À venir (Séance 3)
-
-Classes `Gateway` et `Engine`, boucle de simulation complète et mesures M/M/1,
-M/M/1/K, M/M/c/K (déjà réalisées dans la version Python, voir `../../python/`).
+λ et µ sont des **taux** (messages/s) : l'inter-arrivée moyenne vaut 1/λ et le
+temps de service moyen 1/µ (transformée inverse : `-ln(U)/taux`). Les tests
+vérifient ces moyennes sur un grand échantillon.

@@ -1,58 +1,64 @@
 import java.util.Locale;
 
 /**
- * Event.java — Un événement daté de la simulation à événements discrets.
+ * Event.java — Un événement daté de la simulation.
  *
- * Membres demandés : eventID, message associé, eventType (enum EventType), eventTime.
- * Constructeur : Event(id, type, time, msg).
+ * Membres : eventID, eventType, eventTime, message associé.
+ * Les trois types autorisés sont définis comme constantes :
+ * SEND_MSG, RECV_MSG, MSG_DEPT.
  *
- * Comparable<Event> : permet au Scheduler (PriorityQueue) de trier les événements
- * par ordre chronologique sans appeler sort(). En cas d'égalité de temps, on
- * départage par eventID pour un ordre stable.
+ * À la construction comme dans le setter, le type passe par
+ * IsValidEventType() : s'il ne correspond à aucun des trois types attendus,
+ * il est remplacé par une chaîne vide. Cela évite de se retrouver avec un
+ * événement au type incohérent (faute de frappe dans un test, etc.) et
+ * fiabilise les ajouts au scheduler.
  */
-public class Event implements Comparable<Event> {
+public class Event {
 
-    private int       eventID;    // identifiant unique de l'événement
-    private Message   message;    // message concerné (peut être null pour un DEPT sans message)
-    private EventType eventType;  // SEND_MSG, RECV_MSG ou MSG_DEPT
-    private double    eventTime;  // horodatage de l'événement
+    // Les trois types d'événements du modèle du cours
+    public static final String SEND_MSG = "SEND_MSG";  // un client envoie un message
+    public static final String RECV_MSG = "RECV_MSG";  // la passerelle reçoit le message
+    public static final String MSG_DEPT = "MSG_DEPT";  // la passerelle termine le traitement
 
-    // Constructeur conforme au sujet : Event(id, type, time, msg)
-    public Event(int id, EventType type, double time, Message msg) {
-        this.eventID   = id;
-        this.eventType = type;
-        this.eventTime = time;
-        this.message   = msg;
+    private int     eventID;    // identifiant unique de l'événement
+    private String  eventType;  // SEND_MSG, RECV_MSG ou MSG_DEPT
+    private double  eventTime;  // date de l'événement
+    private Message message;    // message concerné
+
+    /** Constructeur : Event(id, type, time, msg). Le type est validé. */
+    public Event(int eventID, String eventType, double eventTime, Message message) {
+        this.eventID   = eventID;
+        this.eventType = IsValidEventType(eventType) ? eventType : "";
+        this.eventTime = eventTime;
+        this.message   = message;
     }
 
-    // --- Accès au temps ---
-    public double    getEventTime()        { return eventTime; }
-    public void      setEventTime(double t){ this.eventTime = t; }
-
-    // --- Accès au type ---
-    public EventType getEventType()            { return eventType; }
-    public void      setEventType(EventType t) { this.eventType = t; }
-
-    // --- Autres getters ---
-    public int     getEventID() { return eventID; }
-    public Message getMessage() { return message; }
-
-    /** Affiche tous les membres de l'événement. */
-    public void printEvent() {
-        String msgId = (message != null) ? String.valueOf(message.getMessageID()) : "-";
-        System.out.printf(Locale.ROOT, "Event #%d : type=%-10s t=%.3f  msg=%s%n",
-                eventID, eventType, eventTime, msgId);
+    /** Vrai si le type correspond à l'un des trois types attendus. */
+    public boolean IsValidEventType(String type) {
+        return SEND_MSG.equals(type) || RECV_MSG.equals(type) || MSG_DEPT.equals(type);
     }
 
-    /**
-     * Comparaison par ordre chronologique.
-     * En cas d'égalité de temps, on départage par eventID (ordre stable).
-     * Utilisé par PriorityQueue dans le Scheduler — pas besoin de sort().
-     */
-    @Override
-    public int compareTo(Event autre) {
-        int cmp = Double.compare(this.eventTime, autre.eventTime);
-        if (cmp != 0) return cmp;
-        return Integer.compare(this.eventID, autre.eventID);
+    // --- Getters ---
+    public int     GetEventID()   { return eventID; }
+    public String  GetEventType() { return eventType; }
+    public double  GetEventTime() { return eventTime; }
+    public Message GetMessage()   { return message; }
+
+    // --- Setters ---
+    public void SetEventID(int id)        { this.eventID = id; }
+    public void SetEventTime(double t)    { this.eventTime = t; }
+    public void SetMessage(Message m)     { this.message = m; }
+
+    /** Le type est validé : un type inconnu est remplacé par une chaîne vide. */
+    public void SetEventType(String type) {
+        this.eventType = IsValidEventType(type) ? type : "";
+    }
+
+    /** Affiche tous les champs de l'événement. */
+    public void PrintEvent() {
+        String msgID = (message != null) ? String.valueOf(message.GetMessageID()) : "-";
+        System.out.printf(Locale.ROOT,
+            "Event #%d : type=%-8s, eventTime=%.3f, messageID=%s%n",
+            eventID, eventType, eventTime, msgID);
     }
 }
