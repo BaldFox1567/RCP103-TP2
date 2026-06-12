@@ -3,9 +3,6 @@
 Travaux pratiques du Cours 09 (P. B. Velloso & A. Hidouri, CNAM).
 Modèle d'une passerelle IoT : files d'attente M/M/1, M/M/1/K, M/M/c/K.
 
-Le dépôt sépare clairement le **Java** (réalisé séance par séance) du **Python**
-(version complète de référence), et les **séances** entre elles.
-
 ## Organisation
 
 ```
@@ -23,16 +20,9 @@ RCP103-TP2/
 │       ├── figures/       # graphiques éventuels
 │       └── README.md
 │
-├── python/                # projet Python complet (TP de référence)
-│   ├── src/               # une classe par fichier + main + figures
-│   ├── results/           # traces CSV + tableau de métriques
-│   ├── figures/           # graphiques PNG
-│   ├── report/            # rapport LaTeX + PDF compilé
-│   └── README.md
-│
 ├── docs/                  # documents pédagogiques
 │   ├── Seance1_Pedagogique.docx
-│   └── make_doc.py        # script de génération du .docx
+│   └── Seance2-3_Pedagogique.docx
 │
 └── README.md              # ce fichier
 ```
@@ -57,13 +47,6 @@ javac -encoding UTF-8 *.java
 java Engine
 ```
 
-**Python — projet complet**
-```bash
-cd python/src
-python3 main.py all      # tests + trace + simulations
-python3 figures.py       # graphiques
-```
-
 ## Avancement
 
 | Séance | Classes | État |
@@ -73,6 +56,4 @@ python3 figures.py       # graphiques
 | 3 | Gateway, Engine (boucle) + simulations M/M/1, M/M/1/K, M/M/c/K | ✅ |
 
 Les **trois séances Java sont réalisées** : le simulateur est complet et ses
-résultats concordent avec la théorie (accord < 1 %, loi de Little vérifiée). La
-version **Python** couvre le même périmètre et sert de référence croisée
-(notamment pour les graphiques et le rapport).
+résultats concordent avec la théorie (accord < 1 %, loi de Little vérifiée).
