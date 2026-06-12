@@ -356,13 +356,9 @@ public class Engine {
         return this.sumWaitingTime / this.nbServed;
     }
 
-    // Taux de rejet = messages rejetes / messages arrives
+    // Taux de rejet : calcule et porte par la passerelle
     public double GetRejectionRate() {
-        if (this.gateway.GetNbArrivals() == 0) {
-            return 0.0;
-        }
-
-        return (double) this.gateway.GetNbRejected() / this.gateway.GetNbArrivals();
+        return this.gateway.GetRejectionRate();
     }
 
     // Nom du modele simule : M/M/c ou M/M/c/K

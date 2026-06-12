@@ -1,3 +1,5 @@
+import java.util.Locale;
+
 /**
  * La passerelle IoT, c'est-a-dire le systeme etudie : une file d'attente,
  * un ou plusieurs serveurs, et une capacite maximale K (messages en file +
@@ -130,6 +132,18 @@ public class Gateway {
         return this.nbDepartures;
     }
 
+    // Taux de rejet = messages rejetes / messages arrives.
+    // C'est la passerelle qui decide d'accepter ou de rejeter un message
+    // (systeme plein) : elle porte donc le calcul du taux de rejet.
+    // Toujours nul si la capacite est infinie (aucun rejet possible).
+    public double GetRejectionRate() {
+        if (this.nbArrivals == 0) {
+            return 0.0;
+        }
+
+        return (double) this.nbRejected / this.nbArrivals;
+    }
+
     // Affichage
     public void PrintGateway() {
         System.out.println("Gateway");
@@ -142,5 +156,7 @@ public class Gateway {
         System.out.println("  acceptes   : " + this.nbAccepted);
         System.out.println("  rejetes    : " + this.nbRejected);
         System.out.println("  sortis     : " + this.nbDepartures);
+        System.out.println("  tauxRejet  : "
+                + String.format(Locale.US, "%.2f", GetRejectionRate() * 100.0) + " %");
     }
 }

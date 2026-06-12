@@ -1,20 +1,15 @@
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class Queue {
 
     private ArrayList<Message> messageList;
     private int capacity;     // 0 = capacite infinie
-    private int nbArrivals;   // nombre de requetes presentees a la file
-    private int nbRejected;   // nombre de requetes rejetees
 
     // Constructeur par defaut : capacite infinie
     // (aucune limite sur le nombre de requetes stockees)
     public Queue() {
         this.messageList = new ArrayList<Message>();
         this.capacity = 0;
-        this.nbArrivals = 0;
-        this.nbRejected = 0;
     }
 
     // Constructeur avec capacite maximale
@@ -22,8 +17,6 @@ public class Queue {
     public Queue(int capacity) {
         this.messageList = new ArrayList<Message>();
         this.capacity = capacity;
-        this.nbArrivals = 0;
-        this.nbRejected = 0;
     }
 
     // Indique si la file est vide
@@ -46,41 +39,21 @@ public class Queue {
         return this.capacity;
     }
 
-    public int GetNbArrivals() {
-        return this.nbArrivals;
-    }
-
-    public int GetNbRejected() {
-        return this.nbRejected;
-    }
-
     // Setter
     public void SetCapacity(int capacity) {
         this.capacity = capacity;
     }
 
-    // Taux de rejet = requetes rejetees / requetes presentees.
-    // Toujours nul si la capacite est infinie (aucun rejet possible).
-    public double GetRejectionRate() {
-        if (this.nbArrivals == 0) {
-            return 0.0;
-        }
-
-        return (double) this.nbRejected / this.nbArrivals;
-    }
-
     // Ajoute un message en fin de file (FIFO).
-    // Si la file est pleine, le message est rejete et comptabilise.
-    // Renvoie true si le message a ete ajoute, false sinon.
+    // La decision d'accepter ou de rejeter (systeme plein) appartient a la
+    // passerelle ; ici on ajoute simplement le message si la file peut le
+    // contenir. Renvoie true si le message a ete ajoute, false sinon.
     public boolean AddMessage(Message message) {
         if (message == null) {
             return false;
         }
 
-        this.nbArrivals = this.nbArrivals + 1;
-
         if (IsFull()) {
-            this.nbRejected = this.nbRejected + 1;
             return false;
         }
 
@@ -108,10 +81,6 @@ public class Queue {
         }
 
         System.out.println("  nbMessages : " + this.messageList.size());
-        System.out.println("  nbArrivals : " + this.nbArrivals);
-        System.out.println("  nbRejected : " + this.nbRejected);
-        System.out.println("  tauxRejet  : "
-                + String.format(Locale.US, "%.2f", GetRejectionRate() * 100.0) + " %");
 
         for (int i = 0; i < this.messageList.size(); i++) {
             Message message = this.messageList.get(i);
