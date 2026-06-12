@@ -468,7 +468,7 @@ public class Engine {
     public static void Simulations() {
         double[] lambdas = { 4.0, 6.0, 8.0, 12.0 };
         double mu = 8.0;
-        double duration = 100000.0;
+        double duration = 10000.0;
 
         // {nb serveurs, capacite} ; capacite 0 = infinie
         int[][] modeles = { { 1, 0 }, { 1, 4 }, { 1, 8 }, { 3, 8 } };
